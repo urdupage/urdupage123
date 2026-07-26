@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قلم — [Untitled-1]</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400..700&family=Noto+Naskh+Arabic:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:Tahoma,Arial,sans-serif;font-size:12px;background:#d4d0c8;}
+  .app{display:flex;flex-direction:column;height:100vh;}
+
+  /* Title bar */
+  .titlebar{
+    background:linear-gradient(180deg,#2b5fa8,#1a3f7a);
+    color:#fff;padding:4px 8px;display:flex;justify-content:space-between;align-items:center;
+    font-size:13px;flex-shrink:0;
+  }
+  .titlebar .btns span{display:inline-block;width:20px;height:18px;background:#3a6fc0;margin-left:2px;text-align:center;border-radius:2px;font-size:11px;line-height:18px;}
+
+  /* Menu bar */
+  .menubar{
+    background:#ece9d8;border-bottom:1px solid #999;display:flex;
+    padding:2px 6px;flex-shrink:0;position:relative;
+  }
+  .menubar > div{padding:4px 10px;cursor:pointer;position:relative;}
+  .menubar > div:hover{background:#c1d2ee;}
+  .menu-panel{
+    display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid #888;
+    box-shadow:2px 2px 6px rgba(0,0,0,.3);min-width:170px;z-index:40;text-align:left;
+  }
+  .menubar > div.open .menu-panel{display:block;}
+  .menu-panel button{
+    display:block;width:100%;border:none;background:none;padding:6px 12px;
+    text-align:left;font-size:12px;cursor:pointer;
+  }
+  .menu-panel button:hover{background:#c1d2ee;}
+  .menu-panel button .sc{float:right;color:#888;font-size:10.5px;margin-right:0;margin-left:0;padding-left:14px;}
+  .menu-panel{min-width:250px;}
+  .menu-panel hr{border:none;border-top:1px solid #ddd;margin:2px 0;}
+
+  .submenu-item{
+    padding:6px 12px;font-size:12px;cursor:pointer;position:relative;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .submenu-item:hover{background:#c1d2ee;}
+  .submenu-item .arrow{font-size:9px;color:#888;}
+  .submenu-panel{display:none;top:-2px;left:100%;min-width:200px;}
+  .submenu-item.open > .submenu-panel{display:block;}
+
+  /* Toolbars */
+  .toolbar-row{
+    background:#ece9d8;border-bottom:1px solid #bbb;padding:3px 6px;
+    display:flex;gap:4px;align-items:center;flex-wrap:wrap;flex-shrink:0;
+  }
+  .toolbar-row select{font-size:11px;padding:2px;border:1px solid #999;background:#fff;}
+  .toolbar-row button.tb{
+    border:1px solid #999;background:#fff;font-size:11px;padding:3px 6px;cursor:pointer;min-width:24px;
+  }
+  .toolbar-row button.tb.active{background:#a8c6f0;}
+  .tsep2{width:1px;height:20px;background:#999;margin:0 3px;}
+  .brand-tag{margin-right:auto;font-size:11px;color:#555;padding:0 6px;}
+
+  /* Main body: left icon panel + canvas */
+  .main{flex:1;display:flex;overflow:hidden;}
+
+  .icon-panel{
+    width:34px;background:#ece9d8;border-right:1px solid #999;
+    display:flex;flex-direction:column;align-items:center;padding:4px 0;gap:2px;
+    overflow-y:auto;flex-shrink:0;
+  }
+  .icon-panel button{
+    width:28px;height:26px;border:1px solid #999;background:#fff;cursor:pointer;font-size:13px;
+  }
+  .icon-panel button.active{background:#3a6fc0;color:#fff;}
+  .icon-panel .grp{height:6px;}
+  .brand-strip{
+    margin-top:auto;background:#c0356b;color:#fff;font-weight:bold;font-size:11px;
+    writing-mode:vertical-rl;padding:10px 4px;letter-spacing:2px;
+  }
+
+  .canvas-area{
+    flex:1;display:flex;flex-direction:column;overflow:hidden;background:#8f8f8f;
+  }
+  .ruler-row{display:flex;flex-shrink:0;}
+  .ruler-corner{width:22px;background:#ece9d8;border:1px solid #999;flex-shrink:0;}
+  .hruler{
+    flex:1;height:20px;background:#ece9d8;border:1px solid #999;border-right:none;
+    position:relative;overflow:hidden;
+  }
+  .hruler::before{
+    content:"";position:absolute;inset:0;
+    background-image:repeating-linear-gradient(to left,#999 0 1px, transparent 1px 20px);
+  }
+  .canvas-row{flex:1;display:flex;overflow:hidden;}
+  .vruler{
+    width:22px;background:#ece9d8;border:1px solid #999;border-top:none;position:relative;flex-shrink:0;
+  }
+  .vruler::before{
+    content:"";position:absolute;inset:0;
+    background-image:repeating-linear-gradient(to bottom,#999 0 1px, transparent 1px 20px);
+  }
+  .page-scroll{flex:1;overflow:auto;background:#8f8f8f;padding:20px;display:flex;flex-direction:column;align-items:center;gap:20px;}
+  .page{
+    background:#fff;width:660px;min-height:900px;box-shadow:2px 2px 10px rgba(0,0,0,.4);
+    position:relative;flex-shrink:0;
+  }
+  .text-frame{
+    position:absolute;border:1px dashed transparent;
+    font-family:'Noto Nastaliq Urdu',serif;font-size:18px;direction:rtl;text-align:right;
+    outline:none;padding:4px;line-height:2;
+  }
+  .text-frame:focus, .text-frame.selected{border-color:#3a6fc0;}
+  .text-frame:empty:before{content:attr(data-placeholder);color:#aaa;font-size:13px;font-family:Tahoma;}
+  .body-frame{top:20px;right:20px;left:20px;bottom:20px;}
+  img.doc-img{max-width:100%;display:block;}
+  table.doc-table{border-collapse:collapse;}
+  table.doc-table td{border:1px solid #999;padding:6px;min-width:30px;font-family:'Noto Nastaliq Urdu';}
+
+  /* Status bar */
+  .statusbar{
+    background:#ece9d8;border-top:1px solid #999;padding:2px 8px;
+    display:flex;justify-content:space-between;font-size:11px;color:#333;flex-shrink:0;
+  }
+  .statusbar .right{display:flex;gap:10px;}
+
+  /* Dialogs */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:60;}
+  .overlay.open{display:flex;}
+  .dialog{background:#ece9d8;border:1px solid #888;padding:16px;width:280px;font-size:12px;}
+  .dialog h3{margin:0 0 12px;font-size:13px;}
+  .dialog label{display:block;margin:8px 0 3px;}
+  .dialog input,.dialog select{width:100%;padding:4px;border:1px solid #999;}
+  .dialog .row{display:flex;gap:6px;}
+  .dialog .actions{display:flex;gap:6px;margin-top:14px;}
+  .dialog button.btn{padding:5px 14px;border:1px solid #888;background:#fff;cursor:pointer;}
+  .dialog button.btn.primary{background:#3a6fc0;color:#fff;}
+
+  @media (max-width:700px){
+    .page{width:100%;min-width:340px;}
+    .icon-panel{width:30px;}
+    .toolbar-row select{font-size:10px;}
+  }
+
+  /* ── Symbols dropdown ── */
+  .sym-panel{min-width:280px;max-width:320px;padding:6px 0;max-height:70vh;overflow-y:auto;}
+  .sym-cat-label{padding:5px 12px 2px;font-size:10px;color:#888;font-weight:bold;text-transform:uppercase;letter-spacing:.3px;}
+  .sym-grid{display:flex;flex-wrap:wrap;gap:3px;padding:2px 10px 6px;}
+  .sym-btn{width:28px;height:28px;border:1px solid #ccc;background:#fff;font-family:'Noto Nastaliq Urdu',Arial,sans-serif;font-size:15px;cursor:pointer;border-radius:3px;line-height:1;}
+  .sym-btn:hover{background:#c1d2ee;border-color:#3a6fc0;}
+
+  /* ── Embedded Keyboard Preferences (docked at bottom, non-blocking) ── */
+  .qkb-panel{
+    display:none;position:fixed;left:50%;bottom:0;transform:translateX(-50%);
+    width:94vw;max-width:640px;background:#fff;border:1px solid #999;border-bottom:none;
+    border-radius:8px 8px 0 0;box-shadow:0 -4px 18px rgba(0,0,0,.3);z-index:80;
+    font-family:Arial,sans-serif;overflow:hidden;
+  }
+  .qkb-panel.open{display:block;}
+  .qkb-header{background:#2d6a4f;color:#fff;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+  .qkb-lang-select{padding:3px 8px;border-radius:5px;border:none;font-size:11px;cursor:pointer;background:#fff;color:#333;}
+  .qkb-title{font-size:12px;flex:1;text-align:center;min-width:120px;}
+  .qkb-close-btn{background:#3a6fc0;color:#fff;border:none;border-radius:3px;width:20px;height:18px;cursor:pointer;font-size:11px;line-height:1;}
+  .qkb-body{background:#f0f4f8;padding:6px 8px 8px;}
+  .qkb-body-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;flex-wrap:wrap;gap:6px;}
+  .qkb-body-title{font-size:11px;font-weight:bold;color:#333;}
+  .qkb-shift-toggle{padding:3px 10px;border:1px solid #ccc;border-radius:5px;font-size:11px;cursor:pointer;background:#f5f5f5;font-weight:bold;}
+  .qkb-shift-toggle.active{background:#2d6a4f;color:#fff;border-color:#2d6a4f;}
+  .qkb-keyboard{display:flex;flex-direction:column;gap:3px;direction:ltr;user-select:none;}
+  .qkb-row{display:flex;gap:2px;justify-content:center;flex-wrap:nowrap;}
+  .qkb-key{
+    min-width:22px;height:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border:1px solid #bbb;border-radius:4px;cursor:pointer;
+    background:linear-gradient(to bottom,#fff,#e8e8e8);box-shadow:0 1px 0 #999;
+    position:relative;-webkit-tap-highlight-color:transparent;padding:1px 2px;
+  }
+  .qkb-key:hover{background:linear-gradient(to bottom,#e8f5e9,#c8e6c9);border-color:#2d6a4f;}
+  .qkb-key:active{transform:translateY(1px);box-shadow:0 0 0 #999;background:#c8e6c9;}
+  .qkb-key-urdu{font-size:11px;color:#1a1a1a;font-family:'Noto Nastaliq Urdu',Arial,sans-serif;line-height:1;}
+  .qkb-key-shift{font-size:7px;color:#e74c3c;position:absolute;top:1px;right:2px;line-height:1;}
+  .qkb-key-latin{font-size:6px;color:#999;position:absolute;bottom:1px;left:2px;line-height:1;}
+  .qkb-key-space{min-width:100px;background:linear-gradient(to bottom,#fff,#ddd);}
+  .qkb-key-backspace{min-width:36px;background:linear-gradient(to bottom,#fff5f5,#ffcccc);}
+  .qkb-key-enter{min-width:42px;background:linear-gradient(to bottom,#f0fff0,#ccffcc);}
+  .qkb-key-shift-key{min-width:38px;background:linear-gradient(to bottom,#f5f5ff,#ddddf0);font-size:8px;font-weight:bold;color:#555;}
+  .qkb-key-tab{min-width:32px;background:linear-gradient(to bottom,#fffff0,#fffacc);font-size:8px;color:#777;}
+  .qkb-key-caps{min-width:36px;font-size:8px;color:#777;}
+  .qkb-shift-active .qkb-key-shift{color:#2d6a4f;font-weight:bold;}
+  @media(max-width:600px){
+    .qkb-panel{width:100vw;max-width:100vw;}
+    .qkb-key{min-width:18px;height:24px;border-radius:3px;}
+    .qkb-key-urdu{font-size:9px;}
+    .qkb-key-shift{font-size:6px;}
+    .qkb-key-latin{font-size:5px;}
+    .qkb-key-space{min-width:70px;}
+    .qkb-row{gap:2px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="titlebar">
+    <span id="docTitle">قلم — [Untitled-1]</span>
+    <div class="btns"><span>_</span><span>□</span><span>✕</span></div>
+  </div>
+
+  <div class="menubar" id="menubar">
+    <div data-menu="file">File
+      <div class="menu-panel">
+        <button data-action="new">New</button>
+        <button data-action="open">Open…</button>
+        <hr>
+        <button data-action="save">Save</button>
+        <button data-action="saveAs">Save As…</button>
+        <hr>
+        <button data-action="print">Print / PDF</button>
+        <button data-action="exportHtml">Export as HTML</button>
+        <hr>
+        <button data-action="close">Close</button>
+        <button data-action="exit">Exit</button>
+      </div>
+    </div>
+    <div data-menu="edit">Edit
+      <div class="menu-panel">
+        <button data-action="undo">Undo Text Editing <span class="sc">Ctrl+Z</span></button>
+        <hr>
+        <button data-cmd="cut">Cut <span class="sc">Ctrl+X</span></button>
+        <button data-cmd="copy">Copy <span class="sc">Ctrl+C</span></button>
+        <button data-action="pasteSpecial">Paste Special…</button>
+        <button data-cmd="paste">Paste <span class="sc">Ctrl+V</span></button>
+        <button data-action="duplicate">Duplicate…</button>
+        <button data-action="clearContent">Clear <span class="sc">Del</span></button>
+        <button data-action="selectAll">Select All <span class="sc">Ctrl+A</span></button>
+        <hr>
+        <button data-action="findReplace">Find and Replace… <span class="sc">Ctrl+F</span></button>
+        <hr>
+        <button data-action="topMost">Top Most</button>
+        <button data-action="sendToBack">Send To Back</button>
+        <button data-action="bringToFront">Bring To Front</button>
+        <button data-action="lockGuides">Lock Guides</button>
+        <hr>
+        <button data-action="storyEditor">Story Editor <span class="sc">F2</span></button>
+        <button data-action="deletePage">Delete Page… <span class="sc">Alt+Del</span></button>
+        <hr>
+        <div class="submenu-item">Preferences <span class="arrow">▶</span>
+          <div class="menu-panel submenu-panel">
+            <button data-action="prefApplication">Application… <span class="sc">Alt+F11</span></button>
+            <button data-action="prefDocument">Document… <span class="sc">Ctrl+F11</span></button>
+            <button data-action="prefTypographic">Typographic… <span class="sc">F11</span></button>
+            <button data-action="storyEditor">Story Editor… </button>
+            <button data-action="prefKeyboard">Keyboard Preferences…</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div data-menu="view">View
+      <div class="menu-panel">
+        <button data-action="zoomIn">Zoom In</button>
+        <button data-action="zoomOut">Zoom Out</button>
+      </div>
+    </div>
+    <div data-menu="format">Format
+      <div class="menu-panel">
+        <button data-cmd="bold">Bold</button>
+        <button data-cmd="italic">Italic</button>
+        <button data-cmd="underline">Underline</button>
+        <hr>
+        <button data-action="toggleKashida">Kashida Justify</button>
+      </div>
+    </div>
+    <div data-menu="insert">Insert
+      <div class="menu-panel">
+        <button data-action="insertTable">Table</button>
+        <button data-action="insertImage">Picture</button>
+        <button data-action="insertPageBreak">Page Break</button>
+      </div>
+    </div>
+    <div data-menu="symbols">Symbols
+      <div class="menu-panel sym-panel">
+        <div class="sym-cat-label">Diacritics — اعراب</div>
+        <div class="sym-grid">
+          <button class="sym-btn" data-sym="َ">َ</button>
+          <button class="sym-btn" data-sym="ُ">ُ</button>
+          <button class="sym-btn" data-sym="ِ">ِ</button>
+          <button class="sym-btn" data-sym="ّ">ّ</button>
+          <button class="sym-btn" data-sym="ْ">ْ</button>
+          <button class="sym-btn" data-sym="ً">ً</button>
+          <button class="sym-btn" data-sym="ٌ">ٌ</button>
+          <button class="sym-btn" data-sym="ٍ">ٍ</button>
+          <button class="sym-btn" data-sym="ٰ">ٰ</button>
+          <button class="sym-btn" data-sym="ٓ">ٓ</button>
+          <button class="sym-btn" data-sym="ٔ">ٔ</button>
+          <button class="sym-btn" data-sym="ٕ">ٕ</button>
+        </div>
+        <hr>
+        <div class="sym-cat-label">Punctuation — رموز اوقاف</div>
+        <div class="sym-grid">
+          <button class="sym-btn" data-sym="۔">۔</button>
+          <button class="sym-btn" data-sym="،">،</button>
+          <button class="sym-btn" data-sym="؛">؛</button>
+          <button class="sym-btn" data-sym="؟">؟</button>
+          <button class="sym-btn" data-sym="٪">٪</button>
+          <button class="sym-btn" data-sym="٭">٭</button>
+          <button class="sym-btn" data-sym="—">—</button>
+          <button class="sym-btn" data-sym="–">–</button>
+          <button class="sym-btn" data-sym="…">…</button>
+          <button class="sym-btn" data-sym="”">”</button>
+          <button class="sym-btn" data-sym="“">“</button>
+          <button class="sym-btn" data-sym="ـ">ـ</button>
+        </div>
+        <hr>
+        <div class="sym-cat-label">Islamic Phrases</div>
+        <div class="sym-grid">
+          <button class="sym-btn" data-sym="ﷲ" title="Allah">ﷲ</button>
+          <button class="sym-btn" data-sym="ﷺ" title="Peace be upon him">ﷺ</button>
+          <button class="sym-btn" data-sym="ﷻ" title="Subhanahu wa ta'ala">ﷻ</button>
+          <button class="sym-btn" data-sym="ؑ" title="Alayhi as-salam">ؑ</button>
+          <button class="sym-btn" data-sym="ؓ" title="Radiya Allahu anhu">ؓ</button>
+          <button class="sym-btn" data-sym="؈">؈</button>
+        </div>
+        <hr>
+        <div class="sym-cat-label">Numbers — ہندسے</div>
+        <div class="sym-grid">
+          <button class="sym-btn" data-sym="۰">۰</button>
+          <button class="sym-btn" data-sym="۱">۱</button>
+          <button class="sym-btn" data-sym="۲">۲</button>
+          <button class="sym-btn" data-sym="۳">۳</button>
+          <button class="sym-btn" data-sym="۴">۴</button>
+          <button class="sym-btn" data-sym="۵">۵</button>
+          <button class="sym-btn" data-sym="۶">۶</button>
+          <button class="sym-btn" data-sym="۷">۷</button>
+          <button class="sym-btn" data-sym="۸">۸</button>
+          <button class="sym-btn" data-sym="۹">۹</button>
+        </div>
+        <hr>
+        <div class="sym-cat-label">Currency &amp; Misc</div>
+        <div class="sym-grid">
+          <button class="sym-btn" data-sym="؋">؋</button>
+          <button class="sym-btn" data-sym="₨">₨</button>
+          <button class="sym-btn" data-sym="$">$</button>
+          <button class="sym-btn" data-sym="€">€</button>
+          <button class="sym-btn" data-sym="£">£</button>
+          <button class="sym-btn" data-sym="©">©</button>
+          <button class="sym-btn" data-sym="®">®</button>
+          <button class="sym-btn" data-sym="™">™</button>
+          <button class="sym-btn" data-sym="§">§</button>
+          <button class="sym-btn" data-sym="•">•</button>
+          <button class="sym-btn" data-sym="°">°</button>
+        </div>
+      </div>
+    </div>
+    <div data-menu="utilities">Utilities
+      <div class="menu-panel">
+        <button data-action="toggleKeyboard">Urdu Keyboard</button>
+        <button data-action="wordCountDialog">Word Count</button>
+      </div>
+    </div>
+    <div id="langToggleBtn" style="cursor:pointer;">Language</div>
+    <div>Window</div>
+    <div>Help</div>
+  </div>
+
+  <div class="toolbar-row">
+    <select id="paraStyle" class="tb"><option>Normal</option><option>Heading</option></select>
+    <select id="autoSel" class="tb"><option>Auto</option></select>
+    <select id="latinFont" class="tb"><option>Arial</option><option>Times New Roman</option></select>
+    <input type="number" id="latinSize" class="tb" value="12" style="width:44px" title="pt">
+    <button class="tb" data-cmd="bold"><b>B</b></button>
+    <button class="tb" data-cmd="italic"><i>I</i></button>
+    <div class="tsep2"></div>
+    <div class="brand-tag">قلم — پیشہ ورانہ اردو ایڈیٹر</div>
+  </div>
+
+  <div class="toolbar-row">
+    <button class="tb" data-cmd="justifyRight" title="Right">⇥</button>
+    <button class="tb" data-cmd="justifyLeft" title="Left">⇤</button>
+    <button class="tb" data-cmd="justifyCenter" title="Center">≡</button>
+    <button class="tb" data-cmd="justifyFull" title="Justify">☰</button>
+    <input type="number" id="lineSpace" class="tb" value="0" style="width:40px" title="Space (pt)">
+    <select id="urduFont" class="tb"><option>Noori Nastaliq</option><option>Noto Nastaliq</option></select>
+    <input type="color" id="colorPicker" class="tb" value="#000000" title="Color">
+    <button class="tb" data-action="toggleKashida" id="kashidaBtn" title="Kashida">→←</button>
+    <button class="tb" data-cmd="insertUnorderedList" title="List">•≡</button>
+    <select id="zoomSel" class="tb" style="width:64px">
+      <option value="75">75%</option><option value="100" selected>100%</option>
+      <option value="125">125%</option><option value="150">150%</option>
+    </select>
+  </div>
+
+  <div class="main">
+    <div class="icon-panel">
+      <button class="active" data-tool="select" title="Select">↖</button>
+      <button data-tool="text" title="Text Frame">I</button>
+      <button data-action="rotate" title="Rotate">⟳</button>
+      <button data-action="link" title="Link Frames">🔗</button>
+      <div class="grp"></div>
+      <button data-action="insertTextFrame" title="F Box (Text Frame)" style="font-size:9px;">F Box</button>
+      <button data-action="insertImage" title="A Box (Picture)" style="font-size:9px;">A Box</button>
+      <div class="grp"></div>
+      <button data-action="insertImage" title="Insert JPG">Jpg</button>
+      <button data-action="insertImage" title="Insert JPG">Jpg</button>
+      <button data-action="insertImage" title="Insert JPG">Jpg</button>
+      <div class="grp"></div>
+      <button data-shape="ellipse" title="Ellipse">◯</button>
+      <button data-shape="rect" title="Rectangle">▭</button>
+      <button data-shape="rounded" title="Rounded Rect">▢</button>
+      <button data-tool="line" title="Line">╱</button>
+      <button data-tool="free" title="Freehand">✎</button>
+      <div class="brand-strip">قلم</div>
+    </div>
+
+    <div class="canvas-area">
+      <div class="ruler-row">
+        <div class="ruler-corner"></div>
+        <div class="hruler"></div>
+      </div>
+      <div class="canvas-row">
+        <div class="vruler"></div>
+        <div class="page-scroll">
+          <div class="page" id="page1">
+            <div class="text-frame body-frame" contenteditable="true" data-placeholder="یہاں ٹائپ کرنا شروع کریں…"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span id="statusMsg">For Help, press F1</span>
+    <div class="right">
+      <span id="pageInfo">1/1</span>
+      <span id="zoomInfo">100%</span>
+      <span>NUM</span>
+      <span id="langIndicator">ENG</span>
+    </div>
+  </div>
+</div>
+
+<!-- Find & Replace -->
+<div class="overlay" id="frOverlay">
+  <div class="dialog">
+    <h3>Find & Replace</h3>
+    <label>Find</label><input type="text" id="findInput">
+    <label>Replace with</label><input type="text" id="replaceInput">
+    <div class="actions">
+      <button class="btn primary" id="doReplace">Replace All</button>
+      <button class="btn" id="closeFr">Close</button>
+    </div>
+  </div>
+</div>
+<!-- Insert Table -->
+<div class="overlay" id="tblOverlay">
+  <div class="dialog">
+    <h3>Insert Table</h3>
+    <div class="row">
+      <div style="flex:1"><label>Rows</label><input type="number" id="tblRows" value="3" min="1" max="20"></div>
+      <div style="flex:1"><label>Cols</label><input type="number" id="tblCols" value="3" min="1" max="10"></div>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="doInsertTable">Insert</button>
+      <button class="btn" id="closeTbl">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Document Preferences (Page Setup) -->
+<div class="overlay" id="psOverlay">
+  <div class="dialog">
+    <h3>Document Preferences</h3>
+    <label>Page Width</label>
+    <select id="pageSizeSel">
+      <option value="700">A4 (Normal)</option>
+      <option value="600">Narrow</option>
+      <option value="820">Wide</option>
+    </select>
+    <div class="actions">
+      <button class="btn primary" id="applyPs">OK</button>
+      <button class="btn" id="closePs">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Keyboard Preferences: Docked Keyboard (non-blocking, sits at bottom) -->
+<div id="kbEditorPanel" class="qkb-panel">
+  <div class="qkb-header">
+    <select class="qkb-lang-select" id="qkbLangSelect">
+      <option value="phonetic">Urdu Phonetic</option>
+      <option value="farsi">Farsi</option>
+      <option value="arabic">Arabic</option>
+      <option value="kashmiri">Kashmiri</option>
+    </select>
+    <span class="qkb-title" id="qkbHeaderTitle">🖊️ اردو فونیٹک کی بورڈ</span>
+    <button id="kbEditorClose2" class="qkb-close-btn" title="Close">✕</button>
+  </div>
+  <div class="qkb-body">
+    <div class="qkb-body-header">
+      <span class="qkb-body-title" id="qkbTitle">Urdu Phonetic Unicode Keyboard</span>
+      <button class="qkb-shift-toggle" id="qkbShiftBtn">&#8679; Shift</button>
+    </div>
+    <div class="qkb-keyboard" id="qkbKeyboard"></div>
+  </div>
+</div>
+
+<input type="file" id="imgInput" accept="image/*" style="display:none">
+<input type="file" id="openInput" accept=".html,.htm" style="display:none">
+
+<script>
+let activeFrame = null;
+let zoom = 22;
+let kashidaOn = false;
+let guidesLocked = false;
+let currentKbLayout = 'phonetic';
+
+function allFrames(){ return Array.from(document.querySelectorAll('.text-frame')); }
+function getActiveFrame(){ return activeFrame || document.querySelector('.body-frame'); }
+
+function insertSymbol(ch){
+  const f = getActiveFrame();
+  if(!f) return;
+  f.focus();
+  document.execCommand('insertText', false, ch);
+}
+document.querySelectorAll('.sym-btn').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    insertSymbol(btn.dataset.sym);
+  });
+});
+
+document.addEventListener('focusin', e=>{
+  if(e.target.classList && e.target.classList.contains('text-frame')) activeFrame = e.target;
+});
+
+// Menu open/close
+document.querySelectorAll('.menubar > div[data-menu]').forEach(m=>{
+  m.addEventListener('click', e=>{
+    e.stopPropagation();
+    const wasOpen = m.classList.contains('open');
+    document.querySelectorAll('.menubar > div').forEach(x=>x.classList.remove('open'));
+    if(!wasOpen) m.classList.add('open');
+  });
+});
+document.querySelectorAll('.submenu-item').forEach(sm=>{
+  sm.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const wasOpen = sm.classList.contains('open');
+    document.querySelectorAll('.submenu-item').forEach(x=>x.classList.remove('open'));
+    if(!wasOpen) sm.classList.add('open');
+  });
+});
+
+document.addEventListener('click', ()=>{
+  document.querySelectorAll('.menubar > div').forEach(x=>x.classList.remove('open'));
+  document.querySelectorAll('.submenu-item').forEach(x=>x.classList.remove('open'));
+});
+
+// Formatting commands
+document.querySelectorAll('[data-cmd]').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const f = getActiveFrame(); if(f) f.focus();
+    try{ document.execCommand(btn.dataset.cmd, false, null); }catch(err){}
+  });
+});
+
+// Left icon panel tool selection
+document.querySelectorAll('.icon-panel [data-tool]').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    document.querySelectorAll('.icon-panel [data-tool]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+function statusFlash(msg){
+  const s = document.getElementById('statusMsg');
+  s.textContent = msg;
+  setTimeout(()=> s.textContent = 'For Help, press F1', 1500);
+  showToast(msg);
+}
+
+function showToast(msg){
+  let toast = document.getElementById('qalamToast');
+  if(!toast){
+    toast = document.createElement('div');
+    toast.id = 'qalamToast';
+    toast.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1a3f7a;color:#fff;padding:10px 20px;border-radius:6px;font-size:14px;font-family:Tahoma,Arial,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.35);z-index:200;pointer-events:none;transition:opacity .3s;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(()=>{ toast.style.opacity = '0'; }, 1800);
+}
+
+function doAction(action){
+  const f = getActiveFrame();
+  if(action === 'new'){
+    if(document.querySelector('.body-frame').innerText.trim().length && !confirm('Start new document? Unsaved changes will be lost.')) return;
+    document.querySelectorAll('.page').forEach((p,i)=>{ if(i>0) p.remove(); });
+    document.querySelector('.body-frame').innerHTML = '';
+    statusFlash('New document');
+  } else if(action === 'open'){
+    document.getElementById('openInput').click();
+  } else if(action === 'save'){
+    saveDoc(true);
+  } else if(action === 'saveAs'){
+    saveAsDoc();
+  } else if(action === 'close'){
+    if(!confirm('Close document? Unsaved changes will be lost.')) return;
+    document.querySelectorAll('.page').forEach((p,i)=>{ if(i>0) p.remove(); });
+    document.querySelector('.body-frame').innerHTML = '';
+    document.getElementById('docTitle').textContent = 'قلم — [Untitled-1]';
+    statusFlash('Document closed');
+  } else if(action === 'exit'){
+    if(!confirm('Exit application?')) return;
+    window.close();
+    setTimeout(()=>{ statusFlash('Please close this browser tab manually.'); }, 300);
+  } else if(action === 'pasteSpecial'){
+    navigator.clipboard.readText().then(text=>{
+      if(f){ f.focus(); document.execCommand('insertText', false, text); }
+    }).catch(()=> statusFlash('Clipboard access denied by browser — use Ctrl+V instead'));
+  } else if(action === 'duplicate'){
+    const page = document.getElementById('page1') ? document.querySelector('.page') : null;
+    const currentPage = f ? f.closest('.page') : document.querySelector('.page');
+    if(currentPage){
+      const clone = currentPage.cloneNode(true);
+      currentPage.after(clone);
+      renumberPagesForDisplay();
+      statusFlash('Page duplicated');
+    }
+  } else if(action === 'clearContent'){
+    if(f){ f.focus(); document.execCommand('delete'); }
+  } else if(action === 'selectAll'){
+    if(f){
+      f.focus();
+      const range = document.createRange();
+      range.selectNodeContents(f);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  } else if(action === 'topMost' || action === 'bringToFront'){
+    if(activeFrame){ activeFrame.style.zIndex = 50; statusFlash('Brought to front'); }
+  } else if(action === 'sendToBack'){
+    if(activeFrame){ activeFrame.style.zIndex = 0; statusFlash('Sent to back'); }
+  } else if(action === 'lockGuides'){
+    guidesLocked = !guidesLocked;
+    statusFlash(guidesLocked ? 'Guides locked' : 'Guides unlocked');
+  } else if(action === 'storyEditor'){
+    openStoryEditor();
+  } else if(action === 'deletePage'){
+    const pages = document.querySelectorAll('.page');
+    if(pages.length <= 1){ statusFlash('Cannot delete the only page'); return; }
+    const currentPage = f ? f.closest('.page') : pages[pages.length-1];
+    if(confirm('Delete this page?')){ currentPage.remove(); renumberPagesForDisplay(); statusFlash('Page deleted'); }
+  } else if(action === 'prefApplication'){
+    statusFlash('Application Preferences (not available in this version)');
+  } else if(action === 'prefDocument'){
+    document.getElementById('psOverlay').classList.add('open');
+  } else if(action === 'prefTypographic'){
+    statusFlash('Typographic Preferences (not available in this version)');
+  } else if(action === 'prefKeyboard'){
+    openKbEditor();
+  } else if(action === 'print'){
+    window.print();
+  } else if(action === 'exportHtml'){
+    exportHtml();
+  } else if(action === 'undo'){
+    document.execCommand('undo');
+  } else if(action === 'redo'){
+    document.execCommand('redo');
+  } else if(action === 'zoomIn'){
+    zoom = Math.min(zoom+4,48); applyZoom();
+  } else if(action === 'zoomOut'){
+    zoom = Math.max(zoom-4,12); applyZoom();
+  } else if(action === 'toggleKashida'){
+    kashidaOn = !kashidaOn;
+    allFrames().forEach(fr=> fr.style.textAlign = kashidaOn ? 'justify' : 'right');
+    document.getElementById('kashidaBtn').classList.toggle('active', kashidaOn);
+    statusFlash(kashidaOn ? 'Kashida justify ON (approx.)' : 'Kashida justify OFF');
+  } else if(action === 'findReplace'){
+    document.getElementById('frOverlay').classList.add('open');
+  } else if(action === 'insertTable'){
+    document.getElementById('tblOverlay').classList.add('open');
+  } else if(action === 'insertImage'){
+    document.getElementById('imgInput').click();
+  } else if(action === 'insertTextFrame'){
+    if(f){ f.focus(); document.execCommand('insertHTML', false, '<div style="border:1px dashed #999;padding:6px;margin:8px 0;min-height:40px;" contenteditable="true">Text Frame</div>'); }
+  } else if(action === 'insertPageBreak'){
+    addNewPage();
+  } else if(action === 'rotate'){
+    if(activeFrame) activeFrame.style.transform = (activeFrame.style.transform === 'rotate(90deg)') ? '' : 'rotate(90deg)';
+  } else if(action === 'link'){
+    statusFlash('Frame linking (visual only in this preview)');
+  } else if(action === 'wordCountDialog'){
+    let total = 0;
+    allFrames().forEach(fr=>{ const t = fr.innerText.trim(); if(t) total += t.split(/\s+/).length; });
+    alert('Word count: ' + total);
+  } else if(action === 'toggleKeyboard'){
+    openKbEditor();
+  }
+}
+document.querySelectorAll('[data-action]').forEach(el=>{
+  el.addEventListener('click', e=>{ e.stopPropagation(); doAction(el.dataset.action); });
+});
+
+document.addEventListener('keydown', (e)=>{
+  const ctrl = e.ctrlKey || e.metaKey;
+  if(ctrl && e.key.toLowerCase() === 'z'){ e.preventDefault(); doAction('undo'); }
+  else if(ctrl && e.key.toLowerCase() === 'f'){ e.preventDefault(); doAction('findReplace'); }
+  else if(ctrl && e.key.toLowerCase() === 's'){ e.preventDefault(); doAction('save'); }
+  else if(ctrl && e.key.toLowerCase() === 'a' && document.activeElement && document.activeElement.classList.contains('text-frame')){ e.preventDefault(); doAction('selectAll'); }
+  else if(ctrl && e.key === 'F11'){ e.preventDefault(); doAction('prefDocument'); }
+  else if(e.key === 'F11'){ e.preventDefault(); statusFlash('Typographic Preferences (not available in this version)'); }
+  else if(e.key === 'F2'){ e.preventDefault(); doAction('storyEditor'); }
+  else if(e.altKey && e.key === 'Delete'){ e.preventDefault(); doAction('deletePage'); }
+});
+
+
+function applyZoom(){
+  allFrames().forEach(fr=> fr.style.fontSize = zoom+'px');
+  document.getElementById('zoomInfo').textContent = Math.round((zoom/18)*100)+'%';
+}
+document.getElementById('zoomSel').addEventListener('change', e=>{
+  const pct = parseInt(e.target.value);
+  zoom = Math.round(18 * pct/100);
+  applyZoom();
+});
+
+document.getElementById('urduFont').addEventListener('change', e=>{
+  const f = getActiveFrame();
+  const map = {'Noori Nastaliq': "'Noto Nastaliq Urdu',serif", 'Noto Nastaliq': "'Noto Nastaliq Urdu',serif"};
+  if(f) f.style.fontFamily = map[e.target.value] || "'Noto Nastaliq Urdu',serif";
+});
+document.getElementById('colorPicker').addEventListener('input', e=>{
+  const f = getActiveFrame(); if(f){ f.focus(); document.execCommand('foreColor', false, e.target.value); }
+});
+
+// Find & Replace
+document.getElementById('closeFr').addEventListener('click', ()=> document.getElementById('frOverlay').classList.remove('open'));
+document.getElementById('doReplace').addEventListener('click', ()=>{
+  const find = document.getElementById('findInput').value;
+  const rep = document.getElementById('replaceInput').value;
+  if(!find) return;
+  allFrames().forEach(fr=> fr.innerHTML = fr.innerHTML.split(find).join(rep));
+  document.getElementById('frOverlay').classList.remove('open');
+  statusFlash('Replace complete');
+});
+
+// Insert table
+document.getElementById('closeTbl').addEventListener('click', ()=> document.getElementById('tblOverlay').classList.remove('open'));
+document.getElementById('doInsertTable').addEventListener('click', ()=>{
+  const rows = parseInt(document.getElementById('tblRows').value)||3;
+  const cols = parseInt(document.getElementById('tblCols').value)||3;
+  let html = '<table class="doc-table">';
+  for(let r=0;r<rows;r++){ html+='<tr>'; for(let c=0;c<cols;c++) html+='<td>&nbsp;</td>'; html+='</tr>'; }
+  html += '</table><br>';
+  const f = getActiveFrame();
+  if(f){ f.focus(); document.execCommand('insertHTML', false, html); }
+  document.getElementById('tblOverlay').classList.remove('open');
+});
+
+// Document Preferences (Page Setup)
+document.getElementById('closePs').addEventListener('click', ()=> document.getElementById('psOverlay').classList.remove('open'));
+document.getElementById('applyPs').addEventListener('click', ()=>{
+  const width = document.getElementById('pageSizeSel').value + 'px';
+  document.querySelectorAll('.page').forEach(p=> p.style.maxWidth = width);
+  document.getElementById('psOverlay').classList.remove('open');
+  statusFlash('Page size updated');
+});
+
+// Keyboard Preferences — embedded on-screen keyboard that types directly into the document
+const qkbLayouts = {
+  phonetic: { title: "Urdu Phonetic Unicode Keyboard", header: "🖊️ اردو فونیٹک کی بورڈ", rows: [
+    [['َ','ً','`'],['1','!','1'],['2','@','2'],['3','#','3'],['4','$','4'],['5','%','5'],['6','^','6'],['7','&','7'],['8','*','8'],['9','(','9'],['0',')','0'],['-','_','-'],['=','+','=']],
+    [['ق','ْ','q'],['و','ٔ','w'],['ع','ع','e'],['ر','ڑ','r'],['ت','ٹ','t'],['ے','Y','y'],['ء','ئ','u'],['ح','ھ','i'],['و','ؤ','o'],['پ','P','p'],['[','{','['],[']','}',']'],['\\','|','\\']],
+    [['ا','آ','a'],['س','ص','s'],['د','ڈ','d'],['ف','F','f'],['گ','غ','g'],['ہ','ح','h'],['ج','J','j'],['ک','خ','k'],['ل','L','l'],[';',':',';'],["'",'"',"'"]],
+    [['ز','ض','z'],['ش','ژ','x'],['چ','ث','c'],['ط','ظ','v'],['ب','B','b'],['ن','ں','n'],['م','M','m'],[',','؟',','],['.','۔','.'],['/','"','/']],
+  ]},
+  farsi: { title: "Farsi Keyboard", header: "🖊️ فارسی کی بورڈ", rows: [
+    [['َ','ً','`'],['۱','!','1'],['۲','@','2'],['۳','#','3'],['۴','$','4'],['۵','%','5'],['۶','^','6'],['۷','&','7'],['۸','*','8'],['۹','(','9'],['۰',')','0'],['-','_','-'],['=','+','=']],
+    [['ض','ْ','q'],['ص','ٌ','w'],['ث','ً','e'],['ق','ُ','r'],['ف','ٍ','t'],['غ','ِ','y'],['ع','َ','u'],['ه','ّ','i'],['خ','[','o'],['ح',']','p'],['ج','{','['],['چ','}',']']],
+    [['ش','ِ','a'],['س','ٍ','s'],['ی','ى','d'],['ب','إ','f'],['ل','أ','g'],['ا','آ','h'],['ت','ة','j'],['ن','«','k'],['م','»','l'],['ک',':',';'],['گ','"',"'"]],
+    [['ظ','؟','z'],['ط','؛','x'],['ز','ژ','c'],['ر','ّ','v'],['ذ','،','b'],['د','.','n'],['پ','!','m'],[',','،',','],['.','!','.'],['/','؟','/']],
+  ]},
+  arabic: { title: "Arabic Keyboard", header: "🖊️ عربی کی بورڈ", rows: [
+    [['ذ','ّ','`'],['١','!','1'],['٢','@','2'],['٣','#','3'],['٤','$','4'],['٥','%','5'],['٦','^','6'],['٧','&','7'],['٨','*','8'],['٩','(','9'],['٠',')','0'],['-','_','-'],['=','+','=']],
+    [['ض','َ','q'],['ص','ً','w'],['ث','ُ','e'],['ق','ٌ','r'],['ف','ﻹ','t'],['غ','إ','y'],['ع','`','u'],['ه','÷','i'],['خ','×','o'],['ح','؛','p'],['ج','<','['],['د','>',']']],
+    [['ش','ِ','a'],['س','ٍ','s'],['ي','[','d'],['ب',']','f'],['ل','لأ','g'],['ا','أ','h'],['ت','ة','j'],['ن','»','k'],['م','«','l'],['ك',':',';'],['ط','"',"'"]],
+    [['ئ','~','z'],['ء','ْ','x'],['ؤ','ٰ','c'],['ر','ٗ','v'],['لا','لآ','b'],['ى','آ','n'],['ة','،','m'],[',','،',','],['.','!','.'],['/','؟','/']],
+  ]},
+  kashmiri: { title: "Kashmiri Keyboard", header: "🖊️ کشمیری کی بورڈ", rows: [
+    [['َ','ً','`'],['1','!','1'],['2','@','2'],['3','#','3'],['4','$','4'],['5','%','5'],['6','^','6'],['7','&','7'],['8','*','8'],['9','(','9'],['0',')','0'],['-','_','-'],['=','+','=']],
+    [['ق','ؤ','q'],['و','ۄ','w'],['ع','ع','e'],['ر','ڈ','r'],['ت','ٹ','t'],['ے','ى','y'],['ء','ئ','u'],['ح','ھ','i'],['ۆ','ۇ','o'],['پ','ب','p'],['[','{','['],[']','}',']']],
+    [['ا','آ','a'],['س','ش','s'],['د','ذ','d'],['ف','ف','f'],['گ','غ','g'],['ہ','ح','h'],['ج','ژ','j'],['ک','خ','k'],['ل','ل','l'],[';',':',';'],["'",'"',"'"]],
+    [['ز','ض','z'],['ش','ث','x'],['چ','چ','c'],['ط','ظ','v'],['ب','B','b'],['ن','ں','n'],['م','م','m'],[',','،',','],['.','۔','.'],['/','"','/']],
+  ]}
+};
+let qkbLang = 'phonetic';
+let qkbShiftOn = false;
+
+function qkbEscChar(c){
+  return String(c).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;').replace(/\\/g,'&#92;');
+}
+
+// Insert directly into the active Qalam document frame (frame stays focused because
+// key buttons use mousedown+preventDefault, so selection/cursor position is preserved)
+function qkbInsertIntoDoc(ch){
+  const f = getActiveFrame();
+  if(!f) return;
+  f.focus();
+  document.execCommand('insertText', false, ch);
+  if(qkbShiftOn){ qkbShiftOn = false; qkbUpdateShiftBtn(); qkbBuildKeyboard(); }
+}
+function qkbBackspace(){
+  const f = getActiveFrame();
+  if(!f) return;
+  f.focus();
+  document.execCommand('delete', false, null);
+}
+
+function qkbBuildKeyboard(){
+  const layout = qkbLayouts[qkbLang];
+  const kb = document.getElementById('qkbKeyboard');
+  kb.className = 'qkb-keyboard' + (qkbShiftOn ? ' qkb-shift-active' : '');
+  let html = '';
+  layout.rows.forEach((row, rowIdx) => {
+    html += '<div class="qkb-row">';
+    if(rowIdx === 1) html += '<div class="qkb-key qkb-key-tab" data-ch="\t"><span>Tab</span></div>';
+    if(rowIdx === 2) html += '<div class="qkb-key qkb-key-caps" data-action="shift"><span>Caps</span></div>';
+    if(rowIdx === 3) html += '<div class="qkb-key qkb-key-shift-key" data-action="shift"><span>&#8679; Shift</span></div>';
+
+    row.forEach(([normal, shift, latin]) => {
+      const ch = qkbShiftOn ? shift : normal;
+      html += `
+        <div class="qkb-key" data-ch="${qkbEscChar(ch)}">
+          <span class="qkb-key-shift">${qkbEscChar(shift)}</span>
+          <span class="qkb-key-urdu">${qkbEscChar(normal)}</span>
+          <span class="qkb-key-latin">${qkbEscChar(latin)}</span>
+        </div>`;
+    });
+
+    if(rowIdx === 0) html += '<div class="qkb-key qkb-key-backspace" data-action="backspace"><span>&#9003;</span></div>';
+    if(rowIdx === 1) html += '<div class="qkb-key qkb-key-enter" data-ch="\n"><span>Enter</span></div>';
+    if(rowIdx === 3) html += '<div class="qkb-key qkb-key-shift-key" data-action="shift"><span>&#8679;</span></div>';
+    html += '</div>';
+
+    if(rowIdx === 3){
+      html += `<div class="qkb-row">
+        <div class="qkb-key" style="min-width:60px" data-ch="،"><span class="qkb-key-urdu">،</span></div>
+        <div class="qkb-key qkb-key-space" data-ch=" "><span style="font-size:11px;color:#999">Spacebar — اسپیس</span></div>
+        <div class="qkb-key" style="min-width:60px" data-ch="۔"><span class="qkb-key-urdu">۔</span></div>
+      </div>`;
+    }
+  });
+  kb.innerHTML = html;
+  document.getElementById('qkbTitle').textContent = layout.title;
+  document.getElementById('qkbHeaderTitle').textContent = layout.header;
+  qkbBuildKeyMap();
+}
+
+// Map from physical (latin) key -> {normal, shift} Urdu chars, for the current language
+let qkbKeyMap = {};
+function qkbBuildKeyMap(){
+  qkbKeyMap = {};
+  qkbLayouts[qkbLang].rows.forEach(row=>{
+    row.forEach(([normal, shift, latin])=>{
+      if(latin && latin.length === 1) qkbKeyMap[latin.toLowerCase()] = {normal, shift};
+    });
+  });
+}
+
+function qkbUpdateShiftBtn(){
+  const btn = document.getElementById('qkbShiftBtn');
+  btn.classList.toggle('active', qkbShiftOn);
+  btn.innerHTML = qkbShiftOn ? '&#8679; ON' : '&#8679; Shift';
+}
+
+// Prevent the keyboard panel from stealing focus away from the document frame
+document.getElementById('qkbKeyboard').addEventListener('mousedown', e=> e.preventDefault());
+document.getElementById('qkbKeyboard').addEventListener('click', e=>{
+  const keyEl = e.target.closest('.qkb-key');
+  if(!keyEl) return;
+  if(keyEl.dataset.action === 'shift'){
+    qkbShiftOn = !qkbShiftOn; qkbUpdateShiftBtn(); qkbBuildKeyboard();
+  } else if(keyEl.dataset.action === 'backspace'){
+    qkbBackspace();
+  } else if(keyEl.dataset.ch !== undefined){
+    qkbInsertIntoDoc(keyEl.dataset.ch);
+  }
+});
+document.getElementById('qkbShiftBtn').addEventListener('mousedown', e=> e.preventDefault());
+document.getElementById('qkbShiftBtn').addEventListener('click', ()=>{
+  qkbShiftOn = !qkbShiftOn; qkbUpdateShiftBtn(); qkbBuildKeyboard();
+});
+document.getElementById('qkbLangSelect').addEventListener('mousedown', e=> e.stopPropagation());
+document.getElementById('qkbLangSelect').addEventListener('change', ()=>{
+  qkbLang = document.getElementById('qkbLangSelect').value;
+  qkbShiftOn = false; qkbUpdateShiftBtn(); qkbBuildKeyboard();
+});
+
+// Urdu mode is tracked separately from the on-screen panel's visibility, so the
+// small ✕ on the keyboard panel only hides the panel — physical typing stays in
+// Urdu until you explicitly switch it off from the "Language" menu item.
+let qkbUrduModeOn = false;
+
+function showKbPanel(){
+  document.getElementById('kbEditorPanel').classList.add('open');
+  document.querySelector('.page-scroll').style.paddingBottom = '260px';
+}
+function hideKbPanel(){
+  document.getElementById('kbEditorPanel').classList.remove('open');
+  document.querySelector('.page-scroll').style.paddingBottom = '';
+}
+
+function openKbEditor(){
+  qkbUrduModeOn = true;
+  document.getElementById('langIndicator').textContent = 'URDU';
+  showKbPanel();
+  qkbBuildKeyboard();
+}
+function closeKbEditor(){
+  // Only hides the visual panel. Urdu mode (and physical key mapping) stays on —
+  // reopen the panel anytime from Edit > Preferences > Keyboard Preferences,
+  // or Utilities > Urdu Keyboard.
+  hideKbPanel();
+  statusFlash('Keyboard hidden — physical typing is still Urdu');
+}
+document.getElementById('kbEditorClose2').addEventListener('click', closeKbEditor);
+qkbUpdateShiftBtn();
+
+// Language toggle button (menubar): fully switches between plain English typing
+// and the Urdu phonetic keyboard (panel + physical key mapping).
+document.getElementById('langToggleBtn').addEventListener('click', e=>{
+  e.stopPropagation();
+  if(qkbUrduModeOn){
+    qkbUrduModeOn = false;
+    hideKbPanel();
+    document.getElementById('langIndicator').textContent = 'ENG';
+    statusFlash('Switched to English keyboard');
+  } else {
+    openKbEditor();
+    statusFlash('Switched to Urdu keyboard (' + qkbLayouts[qkbLang].title + ')');
+  }
+});
+
+// Physical (laptop) keyboard support — while Urdu mode is on, typing on the real
+// keyboard is mapped through the same phonetic layout as the on-screen keys,
+// regardless of whether the visual panel is currently shown or hidden.
+document.addEventListener('keydown', function(e){
+  if(!qkbUrduModeOn) return;
+  const f = getActiveFrame();
+  if(!f || document.activeElement !== f) return;
+  if(e.ctrlKey || e.metaKey || e.altKey) return;
+  if(e.key === 'Shift'){ qkbShiftOn = true; qkbUpdateShiftBtn(); if(document.getElementById('kbEditorPanel').classList.contains('open')) qkbBuildKeyboard(); return; }
+  if(e.key.length === 1){
+    const mapped = qkbKeyMap[e.key.toLowerCase()];
+    if(mapped){
+      e.preventDefault();
+      document.execCommand('insertText', false, e.shiftKey ? mapped.shift : mapped.normal);
+    }
+  }
+});
+document.addEventListener('keyup', function(e){
+  if(!qkbUrduModeOn) return;
+  if(e.key === 'Shift'){ qkbShiftOn = false; qkbUpdateShiftBtn(); if(document.getElementById('kbEditorPanel').classList.contains('open')) qkbBuildKeyboard(); }
+});
+
+
+// Insert image
+document.getElementById('imgInput').addEventListener('change', e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const f = getActiveFrame();
+    if(f){ f.focus(); document.execCommand('insertHTML', false, `<img class="doc-img" src="${reader.result}">`); }
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+function addNewPage(){
+  const page = document.createElement('div');
+  page.className = 'page';
+  page.innerHTML = `
+    <div class="text-frame body-frame" contenteditable="true" data-placeholder="جاری رکھیں…"></div>
+  `;
+  document.querySelector('.page-scroll').appendChild(page);
+  renumberPagesForDisplay();
+  page.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renumberPagesForDisplay(){
+  const pages = document.querySelectorAll('.page');
+  document.getElementById('pageInfo').textContent = pages.length + '/' + pages.length;
+}
+
+function openStoryEditor(){
+  const f = getActiveFrame();
+  if(!f) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay open';
+  overlay.style.zIndex = 90;
+  overlay.innerHTML = `
+    <div class="dialog" style="width:480px;max-width:92vw;">
+      <h3>Story Editor</h3>
+      <textarea id="storyTextarea" style="width:100%;height:280px;direction:rtl;text-align:right;font-family:'Noto Nastaliq Urdu',serif;font-size:18px;padding:8px;border:1px solid #999;"></textarea>
+      <div class="actions">
+        <button class="btn primary" id="storyApply">Apply</button>
+        <button class="btn" id="storyCancel">Cancel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('storyTextarea').value = f.innerText;
+  document.getElementById('storyApply').addEventListener('click', ()=>{
+    f.innerText = document.getElementById('storyTextarea').value;
+    overlay.remove();
+    statusFlash('Story updated');
+  });
+  document.getElementById('storyCancel').addEventListener('click', ()=> overlay.remove());
+}
+
+function exportHtml(){
+  const content = document.querySelector('.page-scroll').innerHTML;
+  const blob = new Blob([`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"></head><body>${content}</body></html>`], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'document.html'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+const LOCAL_KEY = 'qalam-doc-autosave';
+let currentFileName = 'Untitled-1';
+
+function wrapAsFile(innerContent){
+  return `<!DOCTYPE html><html dir="rtl" lang="ur"><head><meta charset="UTF-8">
+<title>${currentFileName}</title>
+<style>
+body{font-family:'Noto Nastaliq Urdu',serif;font-size:22px;line-height:2.5;direction:rtl;text-align:right;margin:40px;}
+img{max-width:100%;} table{border-collapse:collapse;} td{border:1px solid #999;padding:6px;}
+</style></head><body data-qalam-doc="true">${innerContent}</body></html>`;
+}
+
+function downloadFile(filename, htmlContent){
+  const blob = new Blob([htmlContent], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// Quick Save: writes to browser's local storage on this device (instant, no dialog)
+function saveDoc(manual){
+  try{
+    localStorage.setItem(LOCAL_KEY, document.querySelector('.page-scroll').innerHTML);
+    localStorage.setItem(LOCAL_KEY + ':name', currentFileName);
+    if(manual) statusFlash('Saved (on this device — use "Save As" to save a file to your computer)');
+  }catch(err){
+    console.error(err);
+    if(manual) statusFlash('Save failed: ' + err.message);
+  }
+}
+
+// Save As: prompts for a filename and downloads a real file to the computer
+function saveAsDoc(){
+  const name = prompt('Save As — file name:', currentFileName) ;
+  if(!name) return;
+  currentFileName = name;
+  document.getElementById('docTitle').textContent = 'قلم — [' + name + ']';
+  const content = document.querySelector('.page-scroll').innerHTML;
+  downloadFile(name.endsWith('.html') ? name : name + '.html', wrapAsFile(content));
+  saveDoc(false);
+  statusFlash('File saved to your Downloads folder');
+}
+
+// Open: loads a previously saved .html file back into the editor
+document.getElementById('openInput').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(reader.result, 'text/html');
+    const body = doc.body;
+    if(body && body.getAttribute('data-qalam-doc')){
+      document.querySelector('.page-scroll').innerHTML = body.innerHTML;
+    } else {
+      // Fallback: file wasn't created by Qalam, load raw content into the body frame
+      document.querySelector('.body-frame').innerHTML = body ? body.innerHTML : reader.result;
+    }
+    currentFileName = file.name.replace(/\.html?$/i,'');
+    document.getElementById('docTitle').textContent = 'قلم — [' + currentFileName + ']';
+    statusFlash('Opened: ' + file.name);
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+let saveTimer;
+document.querySelector('.page-scroll').addEventListener('input', ()=>{
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=> saveDoc(false), 800);
+});
+
+function loadDoc(){
+  try{
+    const saved = localStorage.getItem(LOCAL_KEY);
+    const name = localStorage.getItem(LOCAL_KEY + ':name');
+    if(saved) document.querySelector('.page-scroll').innerHTML = saved;
+    if(name){ currentFileName = name; document.getElementById('docTitle').textContent = 'قلم — [' + name + ']'; }
+  }catch(err){}
+}
+loadDoc();
+</script>
+</body>
+</html>
