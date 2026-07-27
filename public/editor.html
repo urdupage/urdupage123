@@ -137,11 +137,36 @@
   .dialog button.btn.primary{background:#3a6fc0;color:#fff;}
 
   @media (max-width:700px){
-    .page{width:100%;min-width:340px;}
-    .icon-panel{width:30px;}
-    .toolbar-row select{font-size:10px;}
-  }
 
+    .page{
+        width:100%;
+        min-width:340px;
+    }
+
+    .icon-panel{
+        width:30px;
+    }
+
+    .toolbar-row select{
+        font-size:10px;
+    }
+
+    /* Mobile menu */
+    .menu-bar{
+        overflow-x:auto;
+        white-space:nowrap;
+        display:flex;
+    }
+
+    .menu-bar::-webkit-scrollbar{
+        display:none;
+    }
+
+    .toolbar-row{
+        overflow-x:auto;
+        white-space:nowrap;
+    }
+}
   /* ── Symbols dropdown ── */
   .sym-panel{min-width:280px;max-width:320px;padding:6px 0;max-height:70vh;overflow-y:auto;}
   .sym-cat-label{padding:5px 12px 2px;font-size:10px;color:#888;font-weight:bold;text-transform:uppercase;letter-spacing:.3px;}
@@ -186,15 +211,37 @@
   .qkb-key-tab{min-width:32px;background:linear-gradient(to bottom,#fffff0,#fffacc);font-size:8px;color:#777;}
   .qkb-key-caps{min-width:36px;font-size:8px;color:#777;}
   .qkb-shift-active .qkb-key-shift{color:#2d6a4f;font-weight:bold;}
-  @media(max-width:600px){
-    .qkb-panel{width:100vw;max-width:100vw;}
-    .qkb-key{min-width:18px;height:24px;border-radius:3px;}
-    .qkb-key-urdu{font-size:9px;}
-    .qkb-key-shift{font-size:6px;}
-    .qkb-key-latin{font-size:5px;}
-    .qkb-key-space{min-width:70px;}
-    .qkb-row{gap:2px;}
-  }
+ @media (max-width:700px){
+
+    .page{
+        width:100%;
+        min-width:340px;
+    }
+
+    .icon-panel{
+        width:30px;
+    }
+
+    .toolbar-row select{
+        font-size:10px;
+    }
+
+    /* Fix menu on mobile */
+    .menubar{
+        display:flex;
+        overflow-x:auto;
+        white-space:nowrap;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    .menubar > div{
+        flex:0 0 auto;
+    }
+
+    .menubar::-webkit-scrollbar{
+        display:none;
+    }
+}
 </style>
 </head>
 <body>
