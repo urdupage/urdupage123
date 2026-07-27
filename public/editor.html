@@ -136,31 +136,25 @@
   .dialog button.btn{padding:5px 14px;border:1px solid #888;background:#fff;cursor:pointer;}
   .dialog button.btn.primary{background:#3a6fc0;color:#fff;}
 
-  @media (max-width:700px){
+ 
 
-    .page{
-        width:100%;
-        min-width:340px;
-    }
+  /* Mobile menu */
+.menubar{
+    display:flex;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    white-space:nowrap;
+    -webkit-overflow-scrolling:touch;
+}
 
-    .icon-panel{
-        width:30px;
-    }
+.menubar > div{
+    flex:0 0 auto;
+    padding:4px 8px;
+}
 
-    .toolbar-row select{
-        font-size:10px;
-    }
-
-    /* Mobile menu */
-    .menu-bar{
-        overflow-x:auto;
-        white-space:nowrap;
-        display:flex;
-    }
-
-    .menu-bar::-webkit-scrollbar{
-        display:none;
-    }
+.menubar::-webkit-scrollbar{
+    display:none;
+}
 
     .toolbar-row{
         overflow-x:auto;
@@ -211,7 +205,8 @@
   .qkb-key-tab{min-width:32px;background:linear-gradient(to bottom,#fffff0,#fffacc);font-size:8px;color:#777;}
   .qkb-key-caps{min-width:36px;font-size:8px;color:#777;}
   .qkb-shift-active .qkb-key-shift{color:#2d6a4f;font-weight:bold;}
- @media (max-width:700px){
+
+@media (max-width:700px){
 
     .page{
         width:100%;
@@ -226,20 +221,20 @@
         font-size:10px;
     }
 
-    /* Fix menu on mobile */
-    .menubar{
-        display:flex;
+    /* Mobile menu */
+    .menu-bar{
         overflow-x:auto;
         white-space:nowrap;
-        -webkit-overflow-scrolling:touch;
+        display:flex;
     }
 
-    .menubar > div{
-        flex:0 0 auto;
-    }
-
-    .menubar::-webkit-scrollbar{
+    .menu-bar::-webkit-scrollbar{
         display:none;
+    }
+
+    .toolbar-row{
+        overflow-x:auto;
+        white-space:nowrap;
     }
 }
 </style>
