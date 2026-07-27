@@ -1342,13 +1342,32 @@ document.getElementById('qkbLangSelect').addEventListener('change', ()=>{
 // Urdu until you explicitly switch it off from the "Language" menu item.
 let qkbUrduModeOn = false;
 
+// Suppresses the phone's native on-screen keyboard while our own Urdu
+// keyboard panel is open (so only one keyboard shows at a time), and
+// restores normal native typing once the panel is closed.
+function setNativeKeyboardSuppressed(suppressed){
+  allFrames().forEach(fr=>{
+    if(suppressed) fr.setAttribute('inputmode','none');
+    else fr.removeAttribute('inputmode');
+  });
+  const f = getActiveFrame();
+  if(f && document.activeElement === f){
+    // Blur+refocus forces mobile browsers to re-evaluate inputmode and
+    // actually hide/show the native keyboard immediately.
+    f.blur();
+    setTimeout(()=> f.focus(), 0);
+  }
+}
+
 function showKbPanel(){
   document.getElementById('kbEditorPanel').classList.add('open');
   document.querySelector('.page-scroll').style.paddingBottom = '260px';
+  setNativeKeyboardSuppressed(true);
 }
 function hideKbPanel(){
   document.getElementById('kbEditorPanel').classList.remove('open');
   document.querySelector('.page-scroll').style.paddingBottom = '';
+  setNativeKeyboardSuppressed(false);
 }
 
 function openKbEditor(){
@@ -1421,7 +1440,8 @@ document.getElementById('imgInput').addEventListener('change', e=>{
 function createPageEl(placeholder){
   const page = document.createElement('div');
   page.className = 'page';
-  page.innerHTML = `<div class="text-frame body-frame" contenteditable="true" data-placeholder="${placeholder || 'جاری رکھیں…'}"></div>`;
+  const suppressed = document.getElementById('kbEditorPanel').classList.contains('open');
+  page.innerHTML = `<div class="text-frame body-frame" contenteditable="true"${suppressed ? ' inputmode="none"' : ''} data-placeholder="${placeholder || 'جاری رکھیں…'}"></div>`;
   return page;
 }
 
