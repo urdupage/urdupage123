@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>قلم — [Untitled-1]</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400..700&family=Noto+Naskh+Arabic:wght@400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400..700&family=Noto+Naskh+Arabic:wght@400..700&family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Lateef&family=Cairo:wght@400;700&family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;}
   body{margin:0;font-family:Tahoma,Arial,sans-serif;font-size:12px;background:#d4d0c8;}
@@ -126,6 +126,7 @@
 
   /* Dialogs */
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:60;}
+  #confirmOverlay{z-index:95;}
   .overlay.open{display:flex;}
   .dialog{background:#ece9d8;border:1px solid #888;padding:16px;width:280px;font-size:12px;}
   .dialog h3{margin:0 0 12px;font-size:13px;}
@@ -222,12 +223,11 @@
     }
 
     /* Mobile menu */
-    .menu-bar{
-        overflow-x:auto;
-        white-space:nowrap;
-        display:flex;
-    }
-
+   .menubar{
+    overflow-x:auto;
+    white-space:nowrap;
+    display:flex;
+}
     .menu-bar::-webkit-scrollbar{
         display:none;
     }
@@ -235,7 +235,95 @@
     .toolbar-row{
         overflow-x:auto;
         white-space:nowrap;
-    }
+    
+}
+}
+
+/* ── Hamburger menu: replaces the horizontal menu bar on ALL screen sizes (desktop + mobile) ── */
+.mobile-menu-row{
+  display:flex;align-items:center;background:#ece9d8;border-bottom:1px solid #999;
+  padding:5px 8px;flex-shrink:0;
+}
+.hamburger-btn{
+  display:flex;width:32px;height:26px;background:#3a6fc0;color:#fff;border:1px solid #1a3f7a;
+  border-radius:3px;font-size:15px;cursor:pointer;align-items:center;justify-content:center;
+  padding:0;line-height:1;
+}
+.mobile-menu-title{margin-left:8px;font-size:11px;color:#555;}
+.mobile-menu-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:140;
+}
+.mobile-menu-overlay.open{display:block;}
+
+/* Hide the desktop horizontal menu bar entirely; the hamburger row replaces it everywhere */
+.menubar{display:none !important;}
+
+/* When opened, the (normally hidden) #menubar becomes a slide-in drawer */
+.menubar.mobile-open{
+  display:flex !important;flex-direction:column;position:fixed;top:0;left:0;
+  width:78vw;max-width:300px;height:100vh;background:#fff;z-index:150;
+  box-shadow:2px 0 12px rgba(0,0,0,.4);overflow-y:auto;padding:6px 0;
+  border-right:1px solid #999;
+}
+.menubar.mobile-open > div{
+  width:100%;padding:12px 16px;border-bottom:1px solid #eee;font-size:13px;
+}
+.menubar.mobile-open .menu-panel{
+  position:static;display:none;width:100%;min-width:0;border:none;box-shadow:none;
+  background:#f5f5f0;
+}
+.menubar.mobile-open > div.open .menu-panel{display:block;}
+.menubar.mobile-open .submenu-panel{
+  position:static;border:none;box-shadow:none;background:#ececec;min-width:0;
+}
+.menubar.mobile-open .submenu-item.open > .submenu-panel{display:block;}
+.menubar.mobile-open .sym-panel{max-height:none;}
+
+/* ── New Document dialog ── */
+.new-dialog{
+  width:300px;max-width:90vw;background:#f3f3f3;padding:18px 20px 22px;
+}
+.new-dialog-header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;
+}
+.new-dialog-header h2{
+  margin:0;font-size:26px;font-weight:400;color:#3a3a3a;font-family:Tahoma,Arial,sans-serif;
+}
+.new-dialog-close{
+  border:none;background:none;font-size:14px;color:#555;cursor:pointer;padding:4px 6px;
+}
+.new-dialog-close:hover{color:#000;}
+.new-doc-grid{display:flex;flex-wrap:wrap;gap:16px;}
+.new-doc-card{
+  border:none;background:#d6d6d6;padding:10px 10px 12px;cursor:pointer;width:170px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;border-radius:1px;
+}
+.new-doc-card:hover{background:#c7c7c7;}
+.new-doc-card:hover .new-doc-thumb{box-shadow:0 0 0 2px #3a6fc0;}
+.new-doc-thumb{
+  width:130px;height:168px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);display:block;
+}
+.new-doc-label{font-size:12px;color:#333;font-family:Tahoma,Arial,sans-serif;}
+
+/* ── Print / PDF: show only the document pages, none of the app chrome ── */
+@media print{
+  .titlebar,.menubar,.mobile-menu-row,.mobile-menu-overlay,.toolbar-row,
+  .icon-panel,.brand-strip,.ruler-row,.statusbar,.overlay,.qkb-panel,.toast{
+    display:none !important;
+  }
+  html,body{background:#fff !important;margin:0;padding:0;}
+  .app,.main,.canvas-area,.canvas-row,.page-scroll{
+    display:block !important;height:auto !important;overflow:visible !important;
+    position:static !important;background:#fff !important;padding:0 !important;margin:0 !important;
+  }
+  .page{
+    box-shadow:none !important;width:100% !important;min-height:0 !important;
+    margin:0 !important;padding:20px !important;box-sizing:border-box;
+    page-break-after:always;break-after:page;
+  }
+  .page:last-child{page-break-after:auto;break-after:auto;}
+  .text-frame{border-color:transparent !important;position:static !important;padding:0 !important;}
+  .body-frame{position:static !important;}
 }
 </style>
 </head>
@@ -271,8 +359,6 @@
         <button data-cmd="copy">Copy <span class="sc">Ctrl+C</span></button>
         <button data-action="pasteSpecial">Paste Special…</button>
         <button data-cmd="paste">Paste <span class="sc">Ctrl+V</span></button>
-        <button data-action="duplicate">Duplicate…</button>
-        <button data-action="clearContent">Clear <span class="sc">Del</span></button>
         <button data-action="selectAll">Select All <span class="sc">Ctrl+A</span></button>
         <hr>
         <button data-action="findReplace">Find and Replace… <span class="sc">Ctrl+F</span></button>
@@ -290,7 +376,6 @@
             <button data-action="prefApplication">Application… <span class="sc">Alt+F11</span></button>
             <button data-action="prefDocument">Document… <span class="sc">Ctrl+F11</span></button>
             <button data-action="prefTypographic">Typographic… <span class="sc">F11</span></button>
-            <button data-action="storyEditor">Story Editor… </button>
             <button data-action="prefKeyboard">Keyboard Preferences…</button>
           </div>
         </div>
@@ -403,10 +488,90 @@
     <div>Help</div>
   </div>
 
+  <div class="mobile-menu-row">
+    <button class="hamburger-btn" id="mobileMenuBtn" aria-label="Menu" title="Menu">☰</button>
+    <span class="mobile-menu-title">قلم</span>
+  </div>
+  <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
   <div class="toolbar-row">
     <select id="paraStyle" class="tb"><option>Normal</option><option>Heading</option></select>
     <select id="autoSel" class="tb"><option>Auto</option></select>
-    <select id="latinFont" class="tb"><option>Arial</option><option>Times New Roman</option></select>
+    <select id="latinFont" class="tb">
+      <optgroup label="Theme Fonts">
+        <option>Cambria</option>
+        <option>Calibri</option>
+        <option>Times New Roman</option>
+        <option selected>Arial</option>
+      </optgroup>
+      <optgroup label="Urdu / Arabic Fonts">
+        <option>Noto Nastaliq Urdu</option>
+        <option>Noto Naskh Arabic</option>
+        <option>Noto Kufi Arabic</option>
+        <option>Amiri</option>
+        <option>Scheherazade New</option>
+        <option>Aref Ruqaa</option>
+        <option>Lateef</option>
+        <option>Cairo</option>
+        <option>Jameel Noori Nastaleeq</option>
+        <option>Alvi Nastaleeq</option>
+        <option>Nafees Nastaleeq</option>
+        <option>PDMS Nastaleeq</option>
+        <option>Urdu Typesetting</option>
+        <option>Al Bayan</option>
+        <option>Geeza Pro</option>
+        <option>Damascus</option>
+        <option>Sakkal Majalla</option>
+      </optgroup>
+      <optgroup label="All Fonts">
+        <option>Agency FB</option>
+        <option>Aldhabi</option>
+        <option>Algerian</option>
+        <option>Andalus</option>
+        <option>Angsana New</option>
+        <option>Aptos</option>
+        <option>Aptos Display</option>
+        <option>Aptos Narrow</option>
+        <option>Arabic Typesetting</option>
+        <option>Arial</option>
+        <option>Arial Black</option>
+        <option>Arial Narrow</option>
+        <option>Arial Rounded MT Bold</option>
+        <option>Arial Unicode MS</option>
+        <option>Bahnschrift</option>
+        <option>Book Antiqua</option>
+        <option>Bookman Old Style</option>
+        <option>Calibri</option>
+        <option>Calibri Light</option>
+        <option>Cambria</option>
+        <option>Cambria Math</option>
+        <option>Candara</option>
+        <option>Century Gothic</option>
+        <option>Comic Sans MS</option>
+        <option>Consolas</option>
+        <option>Constantia</option>
+        <option>Corbel</option>
+        <option>Courier New</option>
+        <option>Franklin Gothic Medium</option>
+        <option>Garamond</option>
+        <option>Georgia</option>
+        <option>Impact</option>
+        <option>Lucida Console</option>
+        <option>Lucida Sans Unicode</option>
+        <option>Palatino Linotype</option>
+        <option>Segoe Print</option>
+        <option>Segoe Script</option>
+        <option>Segoe UI</option>
+        <option>Simplified Arabic</option>
+        <option>Symbol</option>
+        <option>Tahoma</option>
+        <option>Times New Roman</option>
+        <option>Traditional Arabic</option>
+        <option>Trebuchet MS</option>
+        <option>Verdana</option>
+        <option>Wingdings</option>
+      </optgroup>
+    </select>
     <input type="number" id="latinSize" class="tb" value="12" style="width:44px" title="pt">
     <button class="tb" data-cmd="bold"><b>B</b></button>
     <button class="tb" data-cmd="italic"><i>I</i></button>
@@ -420,7 +585,18 @@
     <button class="tb" data-cmd="justifyCenter" title="Center">≡</button>
     <button class="tb" data-cmd="justifyFull" title="Justify">☰</button>
     <input type="number" id="lineSpace" class="tb" value="0" style="width:40px" title="Space (pt)">
-    <select id="urduFont" class="tb"><option>Noori Nastaliq</option><option>Noto Nastaliq</option></select>
+    <select id="urduFont" class="tb">
+      <option>Noori Nastaliq</option>
+      <option>Noto Nastaliq</option>
+      <option>Amiri</option>
+      <option>Scheherazade New</option>
+      <option>Aref Ruqaa</option>
+      <option>Lateef</option>
+      <option>Cairo</option>
+      <option>Noto Kufi Arabic</option>
+      <option>Jameel Noori Nastaleeq</option>
+      <option>Alvi Nastaleeq</option>
+    </select>
     <input type="color" id="colorPicker" class="tb" value="#000000" title="Color">
     <button class="tb" data-action="toggleKashida" id="kashidaBtn" title="Kashida">→←</button>
     <button class="tb" data-cmd="insertUnorderedList" title="List">•≡</button>
@@ -475,6 +651,52 @@
       <span id="zoomInfo">100%</span>
       <span>NUM</span>
       <span id="langIndicator">ENG</span>
+    </div>
+  </div>
+</div>
+
+<!-- Generic Confirm -->
+<div class="overlay" id="confirmOverlay">
+  <div class="dialog">
+    <h3 id="confirmTitle">Confirm</h3>
+    <p id="confirmMsg" style="margin:0 0 4px;font-size:12px;"></p>
+    <div class="actions">
+      <button class="btn primary" id="confirmYesBtn">OK</button>
+      <button class="btn" id="confirmNoBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Document -->
+<div class="overlay" id="newOverlay">
+  <div class="dialog new-dialog">
+    <div class="new-dialog-header">
+      <h2>New</h2>
+      <button class="new-dialog-close" id="closeNew" title="Close">✕</button>
+    </div>
+    <div class="new-doc-grid">
+      <button class="new-doc-card" id="createBlankDoc">
+        <span class="new-doc-thumb"></span>
+        <span class="new-doc-label">Blank document</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Save -->
+<div class="overlay" id="saveOverlay">
+  <div class="dialog">
+    <h3>Save Document</h3>
+    <label>File name</label>
+    <input type="text" id="saveFileName">
+    <label>Save as type</label>
+    <select id="saveFileType">
+      <option value="doc">Word Document (.doc)</option>
+      <option value="html">Web Page (.html)</option>
+    </select>
+    <div class="actions">
+      <button class="btn primary" id="doSaveFile">Save</button>
+      <button class="btn" id="closeSave">Cancel</button>
     </div>
   </div>
 </div>
@@ -549,7 +771,7 @@
 
 <script>
 let activeFrame = null;
-let zoom = 22;
+let zoom = 18;
 let kashidaOn = false;
 let guidesLocked = false;
 let currentKbLayout = 'phonetic';
@@ -574,6 +796,61 @@ document.addEventListener('focusin', e=>{
   if(e.target.classList && e.target.classList.contains('text-frame')) activeFrame = e.target;
 });
 
+// ── Selection tracking ──────────────────────────────────────────────
+// Clicking a toolbar button/select moves focus away from the document,
+// which collapses the browser's text selection *before* our click/change
+// handler runs. We continuously remember the last real selection made
+// inside a text frame, and restore it right before applying any
+// formatting command, so toolbar controls actually affect the text the
+// user highlighted instead of doing nothing.
+let savedRange = null;
+document.addEventListener('selectionchange', ()=>{
+  const sel = window.getSelection();
+  if(!sel || sel.rangeCount === 0) return;
+  const node = sel.anchorNode;
+  const el = node && (node.nodeType === 1 ? node : node.parentElement);
+  if(el && el.closest('.text-frame')){
+    savedRange = sel.getRangeAt(0).cloneRange();
+  }
+});
+function restoreSelection(){
+  const f = getActiveFrame();
+  if(f) f.focus();
+  if(savedRange){
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    try{ sel.addRange(savedRange); }catch(err){}
+  }
+}
+function execFormat(cmd, value){
+  restoreSelection();
+  try{ document.execCommand(cmd, false, value); }catch(err){}
+}
+// Wraps the current selection in a <span> with an inline style — used for
+// font family/size, where execCommand's own support is unreliable.
+function applyInlineStyle(prop, value){
+  restoreSelection();
+  const sel = window.getSelection();
+  if(!sel || sel.rangeCount === 0 || sel.isCollapsed){
+    statusFlash('Select some text first');
+    return;
+  }
+  const range = sel.getRangeAt(0);
+  const span = document.createElement('span');
+  span.style[prop] = value;
+  try{
+    span.appendChild(range.extractContents());
+    range.insertNode(span);
+  }catch(err){ console.error(err); return; }
+  sel.removeAllRanges();
+  const newRange = document.createRange();
+  newRange.selectNodeContents(span);
+  sel.addRange(newRange);
+  savedRange = newRange.cloneRange();
+  const frame = span.closest('.body-frame');
+  if(frame) checkPageOverflow(frame);
+}
+
 // Menu open/close
 document.querySelectorAll('.menubar > div[data-menu]').forEach(m=>{
   m.addEventListener('click', e=>{
@@ -597,12 +874,45 @@ document.addEventListener('click', ()=>{
   document.querySelectorAll('.submenu-item').forEach(x=>x.classList.remove('open'));
 });
 
+// ── Mobile hamburger menu: opens the menu bar as a slide-in drawer ──
+const menubarEl = document.getElementById('menubar');
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+
+function openMobileMenu(){
+  menubarEl.classList.add('mobile-open');
+  mobileMenuOverlay.classList.add('open');
+}
+function closeMobileMenu(){
+  menubarEl.classList.remove('mobile-open');
+  mobileMenuOverlay.classList.remove('open');
+  document.querySelectorAll('.menubar > div').forEach(x=>x.classList.remove('open'));
+  document.querySelectorAll('.submenu-item').forEach(x=>x.classList.remove('open'));
+}
+mobileMenuBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  if(menubarEl.classList.contains('mobile-open')) closeMobileMenu();
+  else openMobileMenu();
+});
+mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+
+// Close the drawer once an actual command/action/symbol is picked (not just a
+// top-level category or submenu toggle), so the drawer doesn't linger open.
+document.querySelectorAll('.menu-panel button, .menu-panel .sym-btn').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    if(menubarEl.classList.contains('mobile-open')) closeMobileMenu();
+  });
+});
+
 // Formatting commands
 document.querySelectorAll('[data-cmd]').forEach(btn=>{
+  // Prevent the button from stealing focus on mousedown, which is what was
+  // collapsing the text selection before the click handler ever ran.
+  btn.addEventListener('mousedown', e=> e.preventDefault());
   btn.addEventListener('click', e=>{
     e.stopPropagation();
-    const f = getActiveFrame(); if(f) f.focus();
-    try{ document.execCommand(btn.dataset.cmd, false, null); }catch(err){}
+    execFormat(btn.dataset.cmd);
+    try{ btn.classList.toggle('active', !!document.queryCommandState(btn.dataset.cmd)); }catch(err){}
   });
 });
 
@@ -636,29 +946,45 @@ function showToast(msg){
   toast._hideTimer = setTimeout(()=>{ toast.style.opacity = '0'; }, 1800);
 }
 
+// In-app confirm dialog — used instead of window.confirm(), which many
+// sandboxed preview environments silently block (causing clicks to do nothing).
+let _confirmYesHandler = null, _confirmNoHandler = null;
+function showConfirm(message, onYes){
+  document.getElementById('confirmMsg').textContent = message;
+  document.getElementById('confirmOverlay').classList.add('open');
+  const yesBtn = document.getElementById('confirmYesBtn');
+  const noBtn = document.getElementById('confirmNoBtn');
+  if(_confirmYesHandler) yesBtn.removeEventListener('click', _confirmYesHandler);
+  if(_confirmNoHandler) noBtn.removeEventListener('click', _confirmNoHandler);
+  _confirmYesHandler = ()=>{ document.getElementById('confirmOverlay').classList.remove('open'); onYes(); };
+  _confirmNoHandler = ()=>{ document.getElementById('confirmOverlay').classList.remove('open'); };
+  yesBtn.addEventListener('click', _confirmYesHandler);
+  noBtn.addEventListener('click', _confirmNoHandler);
+}
+
 function doAction(action){
   const f = getActiveFrame();
   if(action === 'new'){
-    if(document.querySelector('.body-frame').innerText.trim().length && !confirm('Start new document? Unsaved changes will be lost.')) return;
-    document.querySelectorAll('.page').forEach((p,i)=>{ if(i>0) p.remove(); });
-    document.querySelector('.body-frame').innerHTML = '';
-    statusFlash('New document');
+    document.getElementById('newOverlay').classList.add('open');
   } else if(action === 'open'){
     document.getElementById('openInput').click();
-  } else if(action === 'save'){
-    saveDoc(true);
-  } else if(action === 'saveAs'){
-    saveAsDoc();
+  } else if(action === 'save' || action === 'saveAs'){
+    trySaveWithNativePicker().then(handled=>{ if(!handled) openSaveDialog(); });
   } else if(action === 'close'){
-    if(!confirm('Close document? Unsaved changes will be lost.')) return;
-    document.querySelectorAll('.page').forEach((p,i)=>{ if(i>0) p.remove(); });
-    document.querySelector('.body-frame').innerHTML = '';
-    document.getElementById('docTitle').textContent = 'قلم — [Untitled-1]';
-    statusFlash('Document closed');
+    function doClose(){
+      document.querySelectorAll('.page').forEach((p,i)=>{ if(i>0) p.remove(); });
+      document.querySelector('.body-frame').innerHTML = '';
+      document.getElementById('docTitle').textContent = 'قلم — [Untitled-1]';
+      statusFlash('Document closed');
+    }
+    if(document.querySelector('.body-frame').innerText.trim().length){
+      showConfirm('Close document? Unsaved changes will be lost.', doClose);
+    } else { doClose(); }
   } else if(action === 'exit'){
-    if(!confirm('Exit application?')) return;
-    window.close();
-    setTimeout(()=>{ statusFlash('Please close this browser tab manually.'); }, 300);
+    showConfirm('Exit application?', ()=>{
+      window.close();
+      setTimeout(()=>{ statusFlash('Please close this browser tab manually.'); }, 300);
+    });
   } else if(action === 'pasteSpecial'){
     navigator.clipboard.readText().then(text=>{
       if(f){ f.focus(); document.execCommand('insertText', false, text); }
@@ -696,7 +1022,7 @@ function doAction(action){
     const pages = document.querySelectorAll('.page');
     if(pages.length <= 1){ statusFlash('Cannot delete the only page'); return; }
     const currentPage = f ? f.closest('.page') : pages[pages.length-1];
-    if(confirm('Delete this page?')){ currentPage.remove(); renumberPagesForDisplay(); statusFlash('Page deleted'); }
+    showConfirm('Delete this page?', ()=>{ currentPage.remove(); renumberPagesForDisplay(); statusFlash('Page deleted'); });
   } else if(action === 'prefApplication'){
     statusFlash('Application Preferences (not available in this version)');
   } else if(action === 'prefDocument'){
@@ -771,13 +1097,79 @@ document.getElementById('zoomSel').addEventListener('change', e=>{
   applyZoom();
 });
 
+document.getElementById('urduFont').addEventListener('mousedown', e=> e.stopPropagation());
 document.getElementById('urduFont').addEventListener('change', e=>{
   const f = getActiveFrame();
-  const map = {'Noori Nastaliq': "'Noto Nastaliq Urdu',serif", 'Noto Nastaliq': "'Noto Nastaliq Urdu',serif"};
+  const map = {
+    'Noori Nastaliq': "'Noto Nastaliq Urdu',serif",
+    'Noto Nastaliq': "'Noto Nastaliq Urdu',serif",
+    'Amiri': "'Amiri',serif",
+    'Scheherazade New': "'Scheherazade New',serif",
+    'Aref Ruqaa': "'Aref Ruqaa',serif",
+    'Lateef': "'Lateef',serif",
+    'Cairo': "'Cairo',sans-serif",
+    'Noto Kufi Arabic': "'Noto Kufi Arabic',sans-serif",
+    'Jameel Noori Nastaleeq': "'Jameel Noori Nastaleeq','Noto Nastaliq Urdu',serif",
+    'Alvi Nastaleeq': "'Alvi Nastaleeq','Noto Nastaliq Urdu',serif"
+  };
   if(f) f.style.fontFamily = map[e.target.value] || "'Noto Nastaliq Urdu',serif";
 });
 document.getElementById('colorPicker').addEventListener('input', e=>{
-  const f = getActiveFrame(); if(f){ f.focus(); document.execCommand('foreColor', false, e.target.value); }
+  execFormat('foreColor', e.target.value);
+});
+
+// Paragraph style (Normal / Heading) — applies to the current block/caret,
+// works even without a text selection.
+document.getElementById('paraStyle').addEventListener('change', e=>{
+  execFormat('formatBlock', e.target.value === 'Heading' ? 'H2' : 'P');
+});
+
+// Latin font family — wraps the selected text in the chosen font.
+document.getElementById('latinFont').addEventListener('change', e=>{
+  applyInlineStyle('fontFamily', e.target.value);
+});
+
+// Latin font size (pt) — wraps the selected text at the chosen size.
+document.getElementById('latinSize').addEventListener('change', e=>{
+  const pt = parseFloat(e.target.value);
+  if(!pt || pt <= 0) return;
+  applyInlineStyle('fontSize', pt + 'pt');
+});
+
+// Line/paragraph spacing (pt) — applied to the active frame.
+document.getElementById('lineSpace').addEventListener('change', e=>{
+  const f = getActiveFrame();
+  if(!f) return;
+  const pt = parseFloat(e.target.value);
+  f.style.lineHeight = (pt && pt > 0) ? ('calc(2em + ' + pt + 'pt)') : '2';
+});
+
+// Auto / RTL / LTR text direction for the active frame.
+(function setupAutoSel(){
+  const sel = document.getElementById('autoSel');
+  sel.innerHTML = '<option value="auto">Auto</option><option value="rtl">RTL</option><option value="ltr">LTR</option>';
+  sel.addEventListener('change', e=>{
+    const f = getActiveFrame();
+    if(!f) return;
+    if(e.target.value === 'auto'){ f.style.direction = ''; f.removeAttribute('dir'); }
+    else { f.style.direction = e.target.value; }
+  });
+})();
+
+// New Document
+document.getElementById('closeNew').addEventListener('click', ()=> document.getElementById('newOverlay').classList.remove('open'));
+document.getElementById('createBlankDoc').addEventListener('click', ()=>{
+  function makeBlank(){
+    document.querySelectorAll('.page').forEach((p,i)=>{ if(i>0) p.remove(); });
+    document.querySelector('.body-frame').innerHTML = '';
+    document.getElementById('newOverlay').classList.remove('open');
+    statusFlash('New document');
+  }
+  if(document.querySelector('.body-frame').innerText.trim().length){
+    showConfirm('Start new document? Unsaved changes will be lost.', makeBlank);
+  } else {
+    makeBlank();
+  }
 });
 
 // Find & Replace
@@ -808,7 +1200,9 @@ document.getElementById('doInsertTable').addEventListener('click', ()=>{
 document.getElementById('closePs').addEventListener('click', ()=> document.getElementById('psOverlay').classList.remove('open'));
 document.getElementById('applyPs').addEventListener('click', ()=>{
   const width = document.getElementById('pageSizeSel').value + 'px';
-  document.querySelectorAll('.page').forEach(p=> p.style.maxWidth = width);
+  document.querySelectorAll('.page').forEach(p=>{
+    p.style.width = width;
+});
   document.getElementById('psOverlay').classList.remove('open');
   statusFlash('Page size updated');
 });
@@ -977,6 +1371,7 @@ qkbUpdateShiftBtn();
 // and the Urdu phonetic keyboard (panel + physical key mapping).
 document.getElementById('langToggleBtn').addEventListener('click', e=>{
   e.stopPropagation();
+  if(menubarEl.classList.contains('mobile-open')) closeMobileMenu();
   if(qkbUrduModeOn){
     qkbUrduModeOn = false;
     hideKbPanel();
@@ -1023,21 +1418,70 @@ document.getElementById('imgInput').addEventListener('change', e=>{
   e.target.value = '';
 });
 
-function addNewPage(){
+function createPageEl(placeholder){
   const page = document.createElement('div');
   page.className = 'page';
-  page.innerHTML = `
-    <div class="text-frame body-frame" contenteditable="true" data-placeholder="جاری رکھیں…"></div>
-  `;
+  page.innerHTML = `<div class="text-frame body-frame" contenteditable="true" data-placeholder="${placeholder || 'جاری رکھیں…'}"></div>`;
+  return page;
+}
+
+function addNewPage(){
+  const page = createPageEl('جاری رکھیں…');
   document.querySelector('.page-scroll').appendChild(page);
   renumberPagesForDisplay();
   page.scrollIntoView({behavior:'smooth', block:'start'});
+  return page;
 }
 
 function renumberPagesForDisplay(){
   const pages = document.querySelectorAll('.page');
-  document.getElementById('pageInfo').textContent = pages.length + '/' + pages.length;
+  document.getElementById('pageInfo').textContent = "1 / " + pages.length;
 }
+
+function placeCaretAtFrameEnd(el){
+  el.focus();
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  activeFrame = el;
+}
+
+// Auto-pagination: when a page's content overflows its visible area, move the
+// trailing content onto the next page (creating one if needed) so typing can
+// continue there automatically — like reaching the bottom of a page in Word.
+function checkPageOverflow(frame){
+  const wasFocused = (document.activeElement === frame);
+  let guard = 0;
+  let lastTargetFrame = null;
+  while(frame.scrollHeight > frame.clientHeight + 1 && guard < 100){
+    guard++;
+    const pageDiv = frame.closest('.page');
+    let nextPageEl = pageDiv.nextElementSibling;
+    if(!nextPageEl || !nextPageEl.classList.contains('page')){
+      nextPageEl = createPageEl('جاری رکھیں…');
+      pageDiv.after(nextPageEl);
+    }
+    const nextFrame = nextPageEl.querySelector('.body-frame');
+    const lastNode = frame.lastChild;
+    if(!lastNode) break;
+    nextFrame.insertBefore(lastNode, nextFrame.firstChild);
+    lastTargetFrame = nextFrame;
+  }
+  if(lastTargetFrame){
+    renumberPagesForDisplay();
+    if(wasFocused) placeCaretAtFrameEnd(lastTargetFrame);
+    // The content just pushed onto the next page might overflow it too
+    // (e.g. pasting a large block) — cascade the check forward.
+    checkPageOverflow(lastTargetFrame);
+  }
+}
+document.addEventListener('input', e=>{
+  const fr = e.target.closest && e.target.closest('.body-frame');
+  if(fr) checkPageOverflow(fr);
+});
 
 function openStoryEditor(){
   const f = getActiveFrame();
@@ -1084,8 +1528,24 @@ img{max-width:100%;} table{border-collapse:collapse;} td{border:1px solid #999;p
 </style></head><body data-qalam-doc="true">${innerContent}</body></html>`;
 }
 
-function downloadFile(filename, htmlContent){
-  const blob = new Blob([htmlContent], {type:'text/html'});
+// Word-compatible export: adds the MS Office XML namespaces/markers so the
+// file opens directly in Microsoft Word (desktop, mobile app, or Word Online)
+// as a real .doc file rather than a browser page.
+function wrapAsWordFile(innerContent){
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="UTF-8">
+<title>${currentFileName}</title>
+<!--[if gte mso 9]><xml>
+<w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument>
+</xml><![endif]-->
+<style>
+body{font-family:'Noto Nastaliq Urdu',serif;font-size:16pt;line-height:2;direction:rtl;text-align:right;margin:40px;}
+img{max-width:100%;} table{border-collapse:collapse;} td{border:1px solid #999;padding:6px;}
+</style></head><body>${innerContent}</body></html>`;
+}
+
+function downloadFile(filename, fileContent, mimeType){
+  const blob = new Blob([fileContent], {type: mimeType || 'text/html'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url; a.download = filename;
@@ -1105,17 +1565,73 @@ function saveDoc(manual){
   }
 }
 
-// Save As: prompts for a filename and downloads a real file to the computer
-function saveAsDoc(){
-  const name = prompt('Save As — file name:', currentFileName) ;
-  if(!name) return;
+// Native Save As: uses the browser's real OS-level "Save As" dialog
+// (File System Access API — Chrome/Edge desktop only). Returns true if it
+// handled the save (or the user cancelled it), false if unsupported so the
+// caller can fall back to the in-app dialog (needed for Firefox, Safari,
+// and all mobile browsers, which don't implement this API at all).
+async function trySaveWithNativePicker(){
+  if(!window.showSaveFilePicker) return false;
+  try{
+    const handle = await window.showSaveFilePicker({
+      suggestedName: (currentFileName || 'Document') + '.doc',
+      types: [
+        { description: 'Word Document', accept: {'application/msword': ['.doc']} },
+        { description: 'Web Page', accept: {'text/html': ['.html']} }
+      ]
+    });
+    const ext = handle.name.split('.').pop().toLowerCase();
+    const content = document.querySelector('.page-scroll').innerHTML;
+    currentFileName = handle.name.replace(/\.(doc|html?)$/i, '');
+    document.getElementById('docTitle').textContent = 'قلم — [' + currentFileName + ']';
+    const writable = await handle.createWritable();
+    await writable.write(ext === 'html' || ext === 'htm' ? wrapAsFile(content) : wrapAsWordFile(content));
+    await writable.close();
+    saveDoc(false);
+    statusFlash('Saved "' + handle.name + '" to your computer');
+    return true;
+  }catch(err){
+    if(err && err.name === 'AbortError') return true; // user cancelled the dialog — don't fall back
+    console.error(err);
+    return false;
+  }
+}
+
+// Save dialog: lets the user name the file and choose Word (.doc) or Web
+// Page (.html), then downloads it. Fallback for browsers without the native
+// Save As picker (Firefox, Safari, and all mobile browsers) — file goes to
+// the device's Downloads / Files app instead of a folder picker.
+function openSaveDialog(){
+  document.getElementById('saveFileName').value = currentFileName;
+  document.getElementById('saveOverlay').classList.add('open');
+  document.getElementById('saveFileName').focus();
+  document.getElementById('saveFileName').select();
+}
+function closeSaveDialog(){
+  document.getElementById('saveOverlay').classList.remove('open');
+}
+function performSave(){
+  let name = document.getElementById('saveFileName').value.trim();
+  if(!name){ statusFlash('Please enter a file name'); return; }
+  name = name.replace(/\.(doc|html?)$/i, '');
+  const type = document.getElementById('saveFileType').value;
   currentFileName = name;
   document.getElementById('docTitle').textContent = 'قلم — [' + name + ']';
   const content = document.querySelector('.page-scroll').innerHTML;
-  downloadFile(name.endsWith('.html') ? name : name + '.html', wrapAsFile(content));
+  if(type === 'doc'){
+    downloadFile(name + '.doc', wrapAsWordFile(content), 'application/msword');
+  } else {
+    downloadFile(name + '.html', wrapAsFile(content), 'text/html');
+  }
   saveDoc(false);
-  statusFlash('File saved to your Downloads folder');
+  closeSaveDialog();
+  statusFlash('Saved "' + name + (type === 'doc' ? '.doc' : '.html') + '" to your device');
 }
+document.getElementById('doSaveFile').addEventListener('click', performSave);
+document.getElementById('closeSave').addEventListener('click', closeSaveDialog);
+document.getElementById('saveFileName').addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){ e.preventDefault(); performSave(); }
+});
 
 // Open: loads a previously saved .html file back into the editor
 document.getElementById('openInput').addEventListener('change', (e)=>{
@@ -1128,6 +1644,7 @@ document.getElementById('openInput').addEventListener('change', (e)=>{
     const body = doc.body;
     if(body && body.getAttribute('data-qalam-doc')){
       document.querySelector('.page-scroll').innerHTML = body.innerHTML;
+activeFrame = document.querySelector('.text-frame');
     } else {
       // Fallback: file wasn't created by Qalam, load raw content into the body frame
       document.querySelector('.body-frame').innerHTML = body ? body.innerHTML : reader.result;
@@ -1151,10 +1668,12 @@ function loadDoc(){
     const saved = localStorage.getItem(LOCAL_KEY);
     const name = localStorage.getItem(LOCAL_KEY + ':name');
     if(saved) document.querySelector('.page-scroll').innerHTML = saved;
+activeFrame = document.querySelector('.text-frame');
     if(name){ currentFileName = name; document.getElementById('docTitle').textContent = 'قلم — [' + name + ']'; }
   }catch(err){}
 }
 loadDoc();
+applyZoom();
 </script>
 </body>
 </html>
